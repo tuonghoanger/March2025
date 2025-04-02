@@ -1,8 +1,11 @@
 #include "TexturePreprocessor.h"
 #include <filesystem>
-#include "Mesh.h"
-#include "ChiliMath.h"
 #include <sstream>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "ChiliMath.h"
+#include "ModelException.h"
 
 
 template<typename F>
@@ -40,7 +43,6 @@ void TexturePreprocessor::FlipYAllNormalMapsInObj(const std::string& objPath)
 		throw ModelException(__LINE__, __FILE__, imp.GetErrorString());
 	}
 
-
 	// loop through materials and process any normal maps
 	for (auto i = 0u; i < pScene->mNumMaterials; i++)
 	{
@@ -66,7 +68,6 @@ void TexturePreprocessor::FlipYNormalMap(const std::string& pathIn, const std::s
 	// execute processing over every texel in file
 	TransformFile(pathIn, pathOut, ProcessNormal);
 }
-
 
 void TexturePreprocessor::ValidateNormalMap(const std::string& pathIn, float thresholdMin, float thresholdMax)
 {

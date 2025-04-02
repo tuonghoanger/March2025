@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Drawable">
       <UniqueIdentifier>{26eca7da-5327-42d6-a2b2-8b8c343784b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\PS">
+      <UniqueIdentifier>{ecac5df9-a568-42db-9581-3832b9990b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\VS">
+      <UniqueIdentifier>{da3710ab-df7c-4819-8deb-0bcfaf784b35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -193,6 +199,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -665,6 +683,27 @@
     <ClInclude Include="FrameCommander.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PerfLog.h">
+      <Filter>Header Files\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="TechniqueProbe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelProbe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="March2025.rc">
@@ -718,47 +757,59 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SolidVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="SolidPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="PhongPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="PhongVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="TexturedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="TexturedPhongPS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSSpecNormalMap.hlsl">
+    <FxCompile Include="xPhongDifNro.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSNormalMap.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDif_PS.hlsl">
+      <Filter>Shader\PS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongVSNormalMap.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDifMskSpcNrm_PS.hlsl">
+      <Filter>Shader\PS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSNormalMapObject.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDifNrm_PS.hlsl">
+      <Filter>Shader\PS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongVSNotex.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDifSpc_VS.hlsl">
+      <Filter>Shader\VS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSNotex.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDifSpcNrm_VS.hlsl">
+      <Filter>Shader\VS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSSpec.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Phong_PS.hlsl">
+      <Filter>Shader\PS</Filter>
     </FxCompile>
-    <FxCompile Include="PhongPSSpecNormMask.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="PhongDifSpc_PS.hlsl">
+      <Filter>Shader\PS</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongDifSpcNrm_PS.hlsl">
+      <Filter>Shader\PS</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongDif_VS.hlsl">
+      <Filter>Shader\VS</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongDifNrm_VS.hlsl">
+      <Filter>Shader\VS</Filter>
+    </FxCompile>
+    <FxCompile Include="Phong_VS.hlsl">
+      <Filter>Shader\VS</Filter>
+    </FxCompile>
+    <FxCompile Include="Solid_VS.hlsl">
+      <Filter>Shader\VS</Filter>
+    </FxCompile>
+    <FxCompile Include="Solid_PS.hlsl">
+      <Filter>Shader\PS</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongDifMskSpcNrm_VS.hlsl">
+      <Filter>Shader\VS</Filter>
+    </FxCompile>
+    <FxCompile Include="Offset_VS.hlsl">
+      <Filter>Shader\VS</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -22,10 +22,12 @@ public:
         // main phong lighting pass
         Stencil::Resolve(gfx, Stencil::Mode::Off)->Bind(gfx);
         passes[0].Execute(gfx);
+
         // outline masking pass
         Stencil::Resolve(gfx, Stencil::Mode::Write)->Bind(gfx);
         NullPixelShader::Resolve(gfx)->Bind(gfx);
         passes[1].Execute(gfx);
+
         // outline drawing pass
         Stencil::Resolve(gfx, Stencil::Mode::Mask)->Bind(gfx);
         struct SolidColorBuffer

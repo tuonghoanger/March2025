@@ -10,7 +10,6 @@
 #include "ScriptCommander.h"
 #include "Stencil.h"
 #include "FrameCommander.h"
-// https://github.com/planetchili/hw3d/commits/master/?since=2019-12-01&until=2019-12-31&author=planetchili
 
 class App
 {

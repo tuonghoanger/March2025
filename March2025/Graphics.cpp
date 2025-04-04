@@ -1,23 +1,31 @@
 #include "Graphics.h"
 #include "dxerr.h"
 #include <sstream>
-#include <cmath>
 #include <d3dcompiler.h>
+#include <cmath>
 #include <DirectXMath.h>
+#include <array>
 #include "GraphicsThrowMacros.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
+#include "DepthStencil.h"
+#include "RenderTarget.h"
 
+namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
 
-Graphics::Graphics(HWND hWnd)
+
+Graphics::Graphics(HWND hWnd, int width, int height)
+	:
+	width(width),
+	height(height)
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
-	sd.BufferDesc.Width = 0;
-	sd.BufferDesc.Height = 0;
+	sd.BufferDesc.Width = width;
+	sd.BufferDesc.Height = height;
 	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	sd.BufferDesc.RefreshRate.Numerator = 0;
 	sd.BufferDesc.RefreshRate.Denominator = 0;
@@ -57,40 +65,14 @@ Graphics::Graphics(HWND hWnd)
 	));
 
 	// gain access to texture subresource in swap chain (back buffer)
-	wrl::ComPtr<ID3D11Resource> pBackBuffer;
-	GFX_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
-	GFX_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
+	wrl::ComPtr<ID3D11Texture2D> pBackBuffer;
+	GFX_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &pBackBuffer));
+	pTarget = std::shared_ptr<Bind::RenderTarget>{ new Bind::OutputOnlyRenderTarget(*this,pBackBuffer.Get()) };
 
-	// create depth stensil texture
-	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
-	D3D11_TEXTURE2D_DESC descDepth = {};
-	descDepth.Width = WIDTH;
-	descDepth.Height = HEIGHT;
-	descDepth.MipLevels = 1u;
-	descDepth.ArraySize = 1u;
-	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	descDepth.SampleDesc.Count = 1u;
-	descDepth.SampleDesc.Quality = 0u;
-	descDepth.Usage = D3D11_USAGE_DEFAULT;
-	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	GFX_THROW_INFO(pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
-
-	// create view of depth stensil texture
-	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
-	descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	descDSV.Texture2D.MipSlice = 0u;
-	GFX_THROW_INFO(pDevice->CreateDepthStencilView(
-		pDepthStencil.Get(), &descDSV, &pDSV
-	));
-
-	// bind depth stensil view to OM
-	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
-
-	// configure viewport
+	// viewport always fullscreen (for now)
 	D3D11_VIEWPORT vp;
-	vp.Width = WIDTH;
-	vp.Height = HEIGHT;
+	vp.Width = (float)width;
+	vp.Height = (float)height;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
@@ -101,19 +83,9 @@ Graphics::Graphics(HWND hWnd)
 	ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 }
 
-void Graphics::DrawIndexed(UINT count) noxnd
+Graphics::~Graphics()
 {
-	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0u));
-}
-
-void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
-{
-	projection = proj;
-}
-
-DirectX::XMMATRIX Graphics::GetProjection() const noexcept
-{
-	return projection;
+	//ImGui_ImplDX11_Shutdown();
 }
 
 void Graphics::EndFrame()
@@ -124,6 +96,7 @@ void Graphics::EndFrame()
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
+
 	HRESULT hr;
 #ifndef NDEBUG
 	infoManager.Set();
@@ -150,19 +123,31 @@ void Graphics::BeginFrame(float red, float green, float blue) noexcept
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
-	const float color[] = { red,green,blue,1.0f };
-	pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 }
 
-void Graphics::SetCameraMat(DirectX::FXMMATRIX cam) noexcept
+void Graphics::DrawIndexed(UINT count) noxnd
 {
-	cameraSpaceMat = cam;
+	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0u));
 }
 
-DirectX::XMMATRIX Graphics::GetCameraSpaceMat() const noexcept
+void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
 {
-	return cameraSpaceMat;
+	projection = proj;
+}
+
+DirectX::XMMATRIX Graphics::GetProjection() const noexcept
+{
+	return projection;
+}
+
+void Graphics::SetCamera(DirectX::FXMMATRIX cam) noexcept
+{
+	camera = cam;
+}
+
+DirectX::XMMATRIX Graphics::GetCamera() const noexcept
+{
+	return camera;
 }
 
 void Graphics::EnableImgui() noexcept
@@ -179,6 +164,22 @@ bool Graphics::IsImguiEnabled() const noexcept
 {
 	return imguiEnabled;
 }
+
+UINT Graphics::GetWidth() const noexcept
+{
+	return width;
+}
+
+UINT Graphics::GetHeight() const noexcept
+{
+	return height;
+}
+
+std::shared_ptr<Bind::RenderTarget> Graphics::GetTarget()
+{
+	return pTarget;
+}
+
 
 // Graphics exception stuff
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMsgs) noexcept
@@ -228,13 +229,13 @@ HRESULT Graphics::HrException::GetErrorCode() const noexcept
 
 std::string Graphics::HrException::GetErrorString() const noexcept
 {
-	return DXGetErrorStringA(hr);
+	return DXGetErrorString(hr);
 }
 
 std::string Graphics::HrException::GetErrorDescription() const noexcept
 {
 	char buf[512];
-	DXGetErrorDescriptionA(hr, buf, sizeof(buf));
+	DXGetErrorDescription(hr, buf, sizeof(buf));
 	return buf;
 }
 
@@ -243,11 +244,11 @@ std::string Graphics::HrException::GetErrorInfo() const noexcept
 	return info;
 }
 
+
 const char* Graphics::DeviceRemovedException::GetType() const noexcept
 {
 	return " Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
 }
-
 Graphics::InfoException::InfoException(int line, const char* file, std::vector<std::string> infoMsgs) noexcept
 	:
 	Exception(line, file)
@@ -264,6 +265,7 @@ Graphics::InfoException::InfoException(int line, const char* file, std::vector<s
 		info.pop_back();
 	}
 }
+
 
 const char* Graphics::InfoException::what() const noexcept
 {

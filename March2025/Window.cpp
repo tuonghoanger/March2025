@@ -83,7 +83,7 @@ Window::Window(int width, int height, const char* name)
 	// Init ImGui Win32 Impl
 	ImGui_ImplWin32_Init(hWnd);
 	// create graphics object
-	pGfx = std::make_unique<Graphics>(hWnd);
+	pGfx = std::make_unique<Graphics>(hWnd, width, height);
 
 	// register mouse raw input device
 	RAWINPUTDEVICE rid;
@@ -479,7 +479,7 @@ const char* Window::HrException::what() const noexcept
 
 const char* Window::HrException::GetType() const noexcept
 {
-	return "Chili Window Exception";
+	return " Window Exception";
 }
 
 HRESULT Window::HrException::GetErrorCode() const noexcept
@@ -494,7 +494,7 @@ std::string Window::HrException::GetErrorDescription() const noexcept
 
 const char* Window::NoGfxException::GetType() const noexcept
 {
-	return "Chili Window Exception [No Graphics]";
+	return " Window Exception [No Graphics]";
 }
 
 void Window::SetTitle(const std::string& title)

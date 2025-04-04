@@ -2,7 +2,6 @@
 
 // HRESULT hr should exist in the local scope for these macros to work
 
-
 #define GFX_EXCEPT_NOINFO(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
 #define GFX_THROW_NOINFO(hrcall) if( FAILED( hr = (hrcall) ) ) throw Graphics::HrException( __LINE__,__FILE__,hr )
 
@@ -24,4 +23,10 @@
 #define INFOMAN(gfx) HRESULT hr
 #else
 #define INFOMAN(gfx) HRESULT hr; DxgiInfoManager& infoManager = GetInfoManager((gfx))
+#endif
+
+#ifdef NDEBUG
+#define INFOMAN_NOHR(gfx)
+#else
+#define INFOMAN_NOHR(gfx) DxgiInfoManager& infoManager = GetInfoManager((gfx))
 #endif
